@@ -96,10 +96,6 @@ jobs:
 
     steps:
 
-      # ----------------------------------------
-      # Checkout code
-      # ----------------------------------------
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -114,7 +110,7 @@ jobs:
 
 
       # ----------------------------------------
-      # Login to GitHub Container Registry
+      # Login to GHCR
       # ----------------------------------------
 
       - name: Login to GHCR
@@ -175,10 +171,6 @@ jobs:
           zip -r application.zip build/
 
 
-      # ----------------------------------------
-      # Upload artifact
-      # ----------------------------------------
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -198,16 +190,57 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: read
+
     steps:
 
-      - name: Deploy to DEV
-        env:
-          ENV_NAME: ${{ secrets.ENV_NAME }}
-          DEPLOY_MESSAGE: ${{ secrets.DEPLOY_MESSAGE }}
+      # ----------------------------------------
+      # Set image name
+      # ----------------------------------------
 
+      - name: Set image name
         run: |
-          echo "Environment: ${ENV_NAME}"
-          echo "Deployment message: ${DEPLOY_MESSAGE}"
+          echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+
+      # ----------------------------------------
+      # Login to GHCR
+      # ----------------------------------------
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      # ----------------------------------------
+      # Pull image from GHCR
+      # ----------------------------------------
+
+      - name: Pull Docker image
+        run: |
+          docker pull $IMAGE_NAME:latest
+
+
+      # ----------------------------------------
+      # Run container in DEV
+      # ----------------------------------------
+
+      - name: Run Docker container in DEV
+        run: |
+          docker run $IMAGE_NAME:latest
+
+
+      # ----------------------------------------
+      # Deployment message
+      # ----------------------------------------
+
+      - name: DEV deployment successful
+        run: |
           echo "Application deployed successfully to DEV"
 
 
@@ -223,14 +256,55 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: read
+
     steps:
 
-      - name: Deploy to PROD
-        env:
-          ENV_NAME: ${{ secrets.ENV_NAME }}
-          DEPLOY_MESSAGE: ${{ secrets.DEPLOY_MESSAGE }}
+      # ----------------------------------------
+      # Set image name
+      # ----------------------------------------
 
+      - name: Set image name
         run: |
-          echo "Environment: ${ENV_NAME}"
-          echo "Deployment message: ${DEPLOY_MESSAGE}"
+          echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+
+      # ----------------------------------------
+      # Login to GHCR
+      # ----------------------------------------
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      # ----------------------------------------
+      # Pull image from GHCR
+      # ----------------------------------------
+
+      - name: Pull Docker image
+        run: |
+          docker pull $IMAGE_NAME:latest
+
+
+      # ----------------------------------------
+      # Run container in PROD
+      # ----------------------------------------
+
+      - name: Run Docker container in PROD
+        run: |
+          docker run $IMAGE_NAME:latest
+
+
+      # ----------------------------------------
+      # Deployment message
+      # ----------------------------------------
+
+      - name: PROD deployment successful
+        run: |
           echo "Application deployed successfully to PROD"
