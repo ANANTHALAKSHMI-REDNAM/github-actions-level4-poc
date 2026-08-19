@@ -72,14 +72,36 @@ jobs:
 
 
   # ==========================================
-  # JOB 3: BUILD + UPLOAD ARTIFACT
+  # JOB 3: DOCKER BUILD AND RUN
+  # ==========================================
+
+  docker-build:
+
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t github-actions-poc .
+
+      - name: Run Docker container
+        run: |
+          docker run github-actions-poc
+
+
+  # ==========================================
+  # JOB 4: BUILD ARTIFACT
   # ==========================================
 
   build:
 
-    needs:
-      - lint
-      - test
+    needs: docker-build
 
     runs-on: ubuntu-latest
 
@@ -103,7 +125,7 @@ jobs:
 
 
   # ==========================================
-  # JOB 4: DEPLOY TO DEV
+  # JOB 5: DEPLOY TO DEV
   # ==========================================
 
   deploy-dev:
@@ -128,7 +150,7 @@ jobs:
 
 
   # ==========================================
-  # JOB 5: DEPLOY TO PROD
+  # JOB 6: DEPLOY TO PROD
   # ==========================================
 
   deploy-prod:
