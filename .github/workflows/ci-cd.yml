@@ -10,7 +10,10 @@ on:
       - main
 
 
-# Permissions required to push Docker image to GHCR
+# ==========================================
+# WORKFLOW PERMISSIONS
+# ==========================================
+
 permissions:
   contents: read
   packages: write
@@ -94,11 +97,20 @@ jobs:
     steps:
 
       # ----------------------------------------
-      # Checkout repository
+      # Checkout code
       # ----------------------------------------
 
       - name: Checkout code
         uses: actions/checkout@v4
+
+
+      # ----------------------------------------
+      # Create lowercase image name
+      # ----------------------------------------
+
+      - name: Set image name
+        run: |
+          echo "IMAGE_NAME=ghcr.io/${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
 
       # ----------------------------------------
@@ -119,8 +131,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build \
-            -t ghcr.io/${{ github.repository }}:latest .
+          docker build -t $IMAGE_NAME:latest .
 
 
       # ----------------------------------------
@@ -129,7 +140,7 @@ jobs:
 
       - name: Run Docker container
         run: |
-          docker run ghcr.io/${{ github.repository }}:latest
+          docker run $IMAGE_NAME:latest
 
 
       # ----------------------------------------
@@ -138,7 +149,7 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}:latest
+          docker push $IMAGE_NAME:latest
 
 
   # ==========================================
