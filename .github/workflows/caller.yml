@@ -1,0 +1,17 @@
+name: Application CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+
+  python-ci:
+
+    uses: ANANTHALAKSHMI-REDNAM/github-actions-reusable-workflow/.github/workflows/reusable-ci.yml@main
