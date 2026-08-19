@@ -1,4 +1,4 @@
-name: Level 4 CI/CD POC
+name: Level 5 CI/CD POC
 
 on:
   push:
@@ -12,9 +12,9 @@ on:
 
 jobs:
 
-  # -------------------------
+  # ==========================================
   # JOB 1: LINT
-  # -------------------------
+  # ==========================================
 
   lint:
 
@@ -40,9 +40,9 @@ jobs:
           ruff check .
 
 
-  # -------------------------
+  # ==========================================
   # JOB 2: TEST
-  # -------------------------
+  # ==========================================
 
   test:
 
@@ -69,13 +69,44 @@ jobs:
           pytest
 
 
-  # -------------------------
-  # JOB 3: DEPLOY DEV
-  # -------------------------
+  # ==========================================
+  # JOB 3: BUILD + UPLOAD ARTIFACT
+  # ==========================================
+
+  build:
+
+    needs:
+      - lint
+      - test
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create build package
+        run: |
+          mkdir build
+          cp app.py build/
+          cp requirements.txt build/
+          zip -r application.zip build/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-application
+          path: application.zip
+
+
+  # ==========================================
+  # JOB 4: DEPLOY TO DEV
+  # ==========================================
 
   deploy-dev:
 
-    needs: test
+    needs: build
 
     environment: dev
 
@@ -87,15 +118,16 @@ jobs:
         env:
           ENV_NAME: ${{ secrets.ENV_NAME }}
           DEPLOY_MESSAGE: ${{ secrets.DEPLOY_MESSAGE }}
+
         run: |
           echo "Environment: ${ENV_NAME}"
           echo "Deployment message: ${DEPLOY_MESSAGE}"
           echo "Application deployed successfully to DEV"
 
 
-  # -------------------------
-  # JOB 4: DEPLOY PROD
-  # -------------------------
+  # ==========================================
+  # JOB 5: DEPLOY TO PROD
+  # ==========================================
 
   deploy-prod:
 
@@ -111,6 +143,7 @@ jobs:
         env:
           ENV_NAME: ${{ secrets.ENV_NAME }}
           DEPLOY_MESSAGE: ${{ secrets.DEPLOY_MESSAGE }}
+
         run: |
           echo "Environment: ${ENV_NAME}"
           echo "Deployment message: ${DEPLOY_MESSAGE}"
