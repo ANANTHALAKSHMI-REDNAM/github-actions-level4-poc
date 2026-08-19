@@ -15,3 +15,6 @@ jobs:
   python-ci:
 
     uses: ANANTHALAKSHMI-REDNAM/github-actions-reusable-workflow/.github/workflows/reusable-ci.yml@main
+
+    with:
+      python-version: "3.12"
