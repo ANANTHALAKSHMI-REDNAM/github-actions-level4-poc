@@ -1,4 +1,4 @@
-from app import add,multiply
+from app import add, multiply
 
 
 def test_add():
