@@ -18,6 +18,7 @@ jobs:
 
     with:
       python-version: "3.12"
+      docker-image: ghcr.io/ananthalakshmi-rednam/github-actions-level4-poc
 
     secrets:
       POC_MESSAGE: ${{ secrets.POC_MESSAGE }}
