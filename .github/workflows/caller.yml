@@ -13,7 +13,7 @@ on:
 permissions:
   contents: read
   packages: write
-  
+
 
 jobs:
 
@@ -24,6 +24,7 @@ jobs:
     with:
       python-version: "3.12"
       docker-image: ghcr.io/ananthalakshmi-rednam/github-actions-level4-poc
+      version: "v1.0.0"
 
     secrets:
       POC_MESSAGE: ${{ secrets.POC_MESSAGE }}
