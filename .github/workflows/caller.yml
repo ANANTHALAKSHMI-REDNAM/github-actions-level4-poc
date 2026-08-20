@@ -4,16 +4,16 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
 
   pull_request:
     branches:
       - main
 
-
 permissions:
   contents: read
   packages: write
-
 
 jobs:
 
@@ -24,7 +24,7 @@ jobs:
     with:
       python-version: "3.12"
       docker-image: ghcr.io/ananthalakshmi-rednam/github-actions-level4-poc
-      version: "v1.0.0"
+      version: ${{ github.ref_name }}
 
     secrets:
       POC_MESSAGE: ${{ secrets.POC_MESSAGE }}
